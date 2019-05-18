@@ -9,12 +9,15 @@ const cp = require('child_process')
 
 const app = express()
 
+//template模板引擎
 app.engine('html',require('express-art-template'))
 
+//post上传中间件
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use(bodyParser.json())
 
+//session中间件
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
@@ -22,6 +25,7 @@ app.use(session({
     cookie: { secure: false }
 }));
 
+//存session
 app.post('/post', (req, res) => {
     req.session.user = req.body
     res.redirect('/xx')
@@ -109,20 +113,7 @@ app.get('/xx',(req,res) => {
                 var cp4String = ncData.slice(cp4, zzrq2).replace("ChannelB-DIMM0      ", "")
             }
 
-            res.render('./index.html',{
-                cpu: cpuString,
-                zb: zbString,
-                gpu: gpuString,
-                ram1: cp3String,
-                ram2: cp4String,
-                dp: dpString,
-                md: cp1String,
-                mdsize: size1String,
-                fyp: cp2String,
-                fypsize: size2String,
-                state: `${req.session.user.username } .xls 已生成`
-            })
-
+            //存 excel 数据模板
             let xlsxData = [
                 {
                     name: `${ req.session.user.username }`,
@@ -155,28 +146,49 @@ app.get('/xx',(req,res) => {
                 }
             ]
 
-            var buffer = xlsx.build(xlsxData);
-            fs.writeFile(`./fileOut/${ req.session.user.username }.xls`, buffer, function (err) {
-                if (err)
-                {
-                    throw err;
-                }else{
-                    fs.readFileSync(`./fileOut/${req.session.user.username}.xls`, (err, data) => {
-                        if(err){
-                            console.log(`${req.session.user.username}.xls 已生成`)
-                        }else{
-                            console.log(`${req.session.user.username}.xls 已存在，请检查文件夹`)
+            //初始化
+            let buffer = xlsx.build(xlsxData);
+            
+            //检查输出是否已存在，避免覆盖同名
+            fs.readFile(`./fileOut/${req.session.user.username}.xls`, (err, data) => {
+                if (err) {
+                    //生成写入excel
+                    fs.writeFile(`./fileOut/${req.session.user.username}.xls`, buffer, function (err) {
+                        if (err) {
+                            throw err
                         }
+                        // 读xlsx
+                        // var obj = xlsx.parse("./" + "resut.xls");
+                        // console.log(JSON.stringify(obj));
+                    })
+
+                    res.render('./index.html', {
+                        cpu: cpuString,
+                        zb: zbString,
+                        gpu: gpuString,
+                        ram1: cp3String,
+                        ram2: cp4String,
+                        dp: dpString,
+                        md: cp1String,
+                        mdsize: size1String,
+                        fyp: cp2String,
+                        fypsize: size2String,
+                        state: `${req.session.user.username} .xls 已生成`
                     })
                     
-                    
+                } else {
+                    res.send(`
+                    <script>
+                        alert('读取 ${req.session.user.username}.xls 已存在，请检查文件夹')
+                        setTimeout(()=>{window.location.href = '/'},1000)
+                    </script>
+                    `)
                 }
+            })
 
-                // 读xlsx
-                // var obj = xlsx.parse("./" + "resut.xls");
-                // console.log(JSON.stringify(obj));
-            }
-            );
+            
+            
+
         }
     })
 })
