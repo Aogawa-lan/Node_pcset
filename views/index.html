@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>读取电脑配置</title>
+</head>
+<body>
+    <h1>资产</h1>
+    <ul>
+        <li>处理器 ：{{ cpu }}</li>
+        <li>主板 ：{{ zb }}</li>
+        <li>显卡 ：{{ gpu }}</li>
+        <li>内存1 ：{{ ram1 }}</li>
+        <li>内存2 ：{{ ram2 }}</li>
+        <li>显示器 ：{{ dp }}</li>
+        <li>主硬盘 ：{{ md }}</li>
+        <li>主硬盘 ：{{ mdsize }}</li>
+        <li>副硬盘 ：{{ fyp }}</li>
+        <li>副硬盘 ：{{ fypsize }}</li>
+    </ul>
+    <h2>{{ state }}</h2>
+    <button>
+        <a href="/">返回</a>
+    </button>
+</body>
+</html>
